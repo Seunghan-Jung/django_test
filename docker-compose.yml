@@ -1,0 +1,35 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: DB
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  web:
+    container_name: django
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - solr
+
+  solr:
+    container_name: Solr
+    image: solr:8.9
+    ports:
+      - "8983:8983"
+    volumes:
+      - ./data/solr:/var/solr
+    command:
+      - solr-precreate
+      - gettingstarted
